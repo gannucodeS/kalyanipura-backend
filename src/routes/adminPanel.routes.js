@@ -1,15 +1,14 @@
 const { Router } = require('express');
 const controller = require('../controllers/adminPanel.controller');
-const { authenticate } = require('../middleware/auth');
 const { authLimiter } = require('../middleware/rateLimiter');
 
 const router = Router();
 
+router.use(controller.requireAuth);
+
 router.get('/login', controller.getLogin);
 router.post('/login', authLimiter, controller.postLogin);
 router.post('/logout', controller.postLogout);
-
-router.use(authenticate);
 
 router.get('/', controller.dashboard);
 

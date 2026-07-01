@@ -1,4 +1,5 @@
 const adminService = require('../services/admin.service');
+const session = require('../utils/session');
 const prayerRequestService = require('../services/prayerRequest.service');
 const contactService = require('../services/contact.service');
 const givingService = require('../services/giving.service');
@@ -9,11 +10,19 @@ const galleryService = require('../services/gallery.service');
 const ministryService = require('../services/ministry.service');
 const ministryInterestService = require('../services/ministryInterest.service');
 
-const render = (res, view, data = {}) => {
-  res.render(`admin/${view}`, { ...data, email: data.email || '' });
+const requireAuth = (req, res, next) => {
+  req.admin = null;
+  if (req.cookies && req.cookies.adminSession) {
+    req.admin = session.get(req.cookies.adminSession);
+  }
+  if (req.path === '/login' || req.path === '/logout') return next();
+  if (!req.admin) return res.redirect('/admin/login');
+  res.locals.email = req.admin.email;
+  next();
 };
 
 const getLogin = (req, res) => {
+  if (req.admin) return res.redirect('/admin');
   res.render('admin/login', { error: null });
 };
 
@@ -21,9 +30,9 @@ const postLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
     const result = await adminService.login(email, password);
-    res.cookie('adminToken', result.token, {
+    const sessionId = session.create({ email: result.email });
+    res.cookie('adminSession', sessionId, {
       httpOnly: true,
-      sameSite: 'lax',
       path: '/',
       maxAge: 24 * 60 * 60 * 1000,
     });
@@ -34,7 +43,10 @@ const postLogin = async (req, res) => {
 };
 
 const postLogout = (req, res) => {
-  res.clearCookie('adminToken');
+  if (req.cookies && req.cookies.adminSession) {
+    session.destroy(req.cookies.adminSession);
+  }
+  res.clearCookie('adminSession');
   res.redirect('/admin/login');
 };
 
@@ -48,8 +60,7 @@ const dashboard = async (req, res) => {
       eventRsvpService.count({}),
       ministryInterestService.count({}),
     ]);
-    render(res, 'dashboard', {
-      email: req.admin.email,
+    res.render('admin/dashboard', {
       stats: { prayerRequests, messages, giving, events, eventRsvps, ministryInterests },
     });
   } catch (err) {
@@ -60,8 +71,7 @@ const dashboard = async (req, res) => {
 const getPrayerRequests = async (req, res) => {
   try {
     const result = await prayerRequestService.getAll({ page: req.query.page || 1, limit: 50, includeDeleted: false });
-    render(res, 'prayer-requests', {
-      email: req.admin.email,
+    res.render('admin/prayer-requests', {
       requests: result.data,
       pagination: result.pagination,
       active: 'prayer-requests',
@@ -74,7 +84,7 @@ const getPrayerRequests = async (req, res) => {
 const viewPrayerRequest = async (req, res) => {
   try {
     const r = await prayerRequestService.getById(req.params.id);
-    render(res, 'prayer-request-view', { email: req.admin.email, r, active: 'prayer-requests' });
+    res.render('admin/prayer-request-view', { r, active: 'prayer-requests' });
   } catch (err) {
     res.redirect('/admin/prayer-requests');
   }
@@ -101,8 +111,7 @@ const deletePrayerRequest = async (req, res) => {
 const getMessages = async (req, res) => {
   try {
     const result = await contactService.getAll({ page: req.query.page || 1, limit: 50, includeDeleted: false });
-    render(res, 'messages', {
-      email: req.admin.email,
+    res.render('admin/messages', {
       messages: result.data,
       pagination: result.pagination,
       active: 'messages',
@@ -115,7 +124,7 @@ const getMessages = async (req, res) => {
 const viewMessage = async (req, res) => {
   try {
     const m = await contactService.getById(req.params.id);
-    render(res, 'message-view', { email: req.admin.email, m, active: 'messages' });
+    res.render('admin/message-view', { m, active: 'messages' });
   } catch (err) {
     res.redirect('/admin/messages');
   }
@@ -142,8 +151,7 @@ const deleteMessage = async (req, res) => {
 const getGiving = async (req, res) => {
   try {
     const result = await givingService.getAll({ page: req.query.page || 1, limit: 50, includeDeleted: false });
-    render(res, 'giving', {
-      email: req.admin.email,
+    res.render('admin/giving', {
       records: result.data,
       pagination: result.pagination,
       active: 'giving',
@@ -165,14 +173,14 @@ const deleteGiving = async (req, res) => {
 const getServiceTimes = async (req, res) => {
   try {
     const items = await serviceTimeService.getAll({ page: 1, limit: 100, includeDeleted: false });
-    render(res, 'service-times', { email: req.admin.email, items: items.data, active: 'service-times' });
+    res.render('admin/service-times', { items: items.data, active: 'service-times' });
   } catch (err) {
     res.redirect('/admin');
   }
 };
 
 const newServiceTime = async (req, res) => {
-  render(res, 'service-time-form', { email: req.admin.email, item: {}, active: 'service-times' });
+  res.render('admin/service-time-form', { item: {}, active: 'service-times' });
 };
 
 const createServiceTime = async (req, res) => {
@@ -180,14 +188,14 @@ const createServiceTime = async (req, res) => {
     await serviceTimeService.create(req.body);
     res.redirect('/admin/service-times');
   } catch (err) {
-    render(res, 'service-time-form', { email: req.admin.email, item: req.body, error: err.message, active: 'service-times' });
+    res.render('admin/service-time-form', { item: req.body, error: err.message, active: 'service-times' });
   }
 };
 
 const editServiceTime = async (req, res) => {
   try {
     const item = await serviceTimeService.getById(req.params.id);
-    render(res, 'service-time-form', { email: req.admin.email, item, active: 'service-times' });
+    res.render('admin/service-time-form', { item, active: 'service-times' });
   } catch (err) {
     res.redirect('/admin/service-times');
   }
@@ -199,7 +207,7 @@ const updateServiceTime = async (req, res) => {
     res.redirect('/admin/service-times');
   } catch (err) {
     const item = { ...req.body, _id: req.params.id };
-    render(res, 'service-time-form', { email: req.admin.email, item, error: err.message, active: 'service-times' });
+    res.render('admin/service-time-form', { item, error: err.message, active: 'service-times' });
   }
 };
 
@@ -215,14 +223,14 @@ const deleteServiceTime = async (req, res) => {
 const getEvents = async (req, res) => {
   try {
     const items = await eventService.getAll({ page: 1, limit: 100, includeDeleted: false });
-    render(res, 'events', { email: req.admin.email, items: items.data, active: 'events' });
+    res.render('admin/events', { items: items.data, active: 'events' });
   } catch (err) {
     res.redirect('/admin');
   }
 };
 
 const newEvent = async (req, res) => {
-  render(res, 'event-form', { email: req.admin.email, item: {}, active: 'events' });
+  res.render('admin/event-form', { item: {}, active: 'events' });
 };
 
 const createEvent = async (req, res) => {
@@ -231,14 +239,14 @@ const createEvent = async (req, res) => {
     await eventService.create(req.body);
     res.redirect('/admin/events');
   } catch (err) {
-    render(res, 'event-form', { email: req.admin.email, item: req.body, error: err.message, active: 'events' });
+    res.render('admin/event-form', { item: req.body, error: err.message, active: 'events' });
   }
 };
 
 const editEvent = async (req, res) => {
   try {
     const item = await eventService.getById(req.params.id);
-    render(res, 'event-form', { email: req.admin.email, item, active: 'events' });
+    res.render('admin/event-form', { item, active: 'events' });
   } catch (err) {
     res.redirect('/admin/events');
   }
@@ -251,7 +259,7 @@ const updateEvent = async (req, res) => {
     res.redirect('/admin/events');
   } catch (err) {
     const item = { ...req.body, _id: req.params.id };
-    render(res, 'event-form', { email: req.admin.email, item, error: err.message, active: 'events' });
+    res.render('admin/event-form', { item, error: err.message, active: 'events' });
   }
 };
 
@@ -267,14 +275,14 @@ const deleteEvent = async (req, res) => {
 const getGallery = async (req, res) => {
   try {
     const items = await galleryService.getAll({ page: 1, limit: 100, includeDeleted: false });
-    render(res, 'gallery', { email: req.admin.email, items: items.data, active: 'gallery' });
+    res.render('admin/gallery', { items: items.data, active: 'gallery' });
   } catch (err) {
     res.redirect('/admin');
   }
 };
 
 const newGallery = async (req, res) => {
-  render(res, 'gallery-form', { email: req.admin.email, item: {}, active: 'gallery' });
+  res.render('admin/gallery-form', { item: {}, active: 'gallery' });
 };
 
 const createGallery = async (req, res) => {
@@ -282,14 +290,14 @@ const createGallery = async (req, res) => {
     await galleryService.create(req.body);
     res.redirect('/admin/gallery');
   } catch (err) {
-    render(res, 'gallery-form', { email: req.admin.email, item: req.body, error: err.message, active: 'gallery' });
+    res.render('admin/gallery-form', { item: req.body, error: err.message, active: 'gallery' });
   }
 };
 
 const editGallery = async (req, res) => {
   try {
     const item = await galleryService.getById(req.params.id);
-    render(res, 'gallery-form', { email: req.admin.email, item, active: 'gallery' });
+    res.render('admin/gallery-form', { item, active: 'gallery' });
   } catch (err) {
     res.redirect('/admin/gallery');
   }
@@ -301,7 +309,7 @@ const updateGallery = async (req, res) => {
     res.redirect('/admin/gallery');
   } catch (err) {
     const item = { ...req.body, _id: req.params.id };
-    render(res, 'gallery-form', { email: req.admin.email, item, error: err.message, active: 'gallery' });
+    res.render('admin/gallery-form', { item, error: err.message, active: 'gallery' });
   }
 };
 
@@ -317,14 +325,14 @@ const deleteGallery = async (req, res) => {
 const getMinistries = async (req, res) => {
   try {
     const items = await ministryService.getAll({ page: 1, limit: 100, includeDeleted: false });
-    render(res, 'ministries', { email: req.admin.email, items: items.data, active: 'ministries' });
+    res.render('admin/ministries', { items: items.data, active: 'ministries' });
   } catch (err) {
     res.redirect('/admin');
   }
 };
 
 const newMinistry = async (req, res) => {
-  render(res, 'ministry-form', { email: req.admin.email, item: {}, active: 'ministries' });
+  res.render('admin/ministry-form', { item: {}, active: 'ministries' });
 };
 
 const createMinistry = async (req, res) => {
@@ -332,14 +340,14 @@ const createMinistry = async (req, res) => {
     await ministryService.create(req.body);
     res.redirect('/admin/ministries');
   } catch (err) {
-    render(res, 'ministry-form', { email: req.admin.email, item: req.body, error: err.message, active: 'ministries' });
+    res.render('admin/ministry-form', { item: req.body, error: err.message, active: 'ministries' });
   }
 };
 
 const editMinistry = async (req, res) => {
   try {
     const item = await ministryService.getById(req.params.id);
-    render(res, 'ministry-form', { email: req.admin.email, item, active: 'ministries' });
+    res.render('admin/ministry-form', { item, active: 'ministries' });
   } catch (err) {
     res.redirect('/admin/ministries');
   }
@@ -351,7 +359,7 @@ const updateMinistry = async (req, res) => {
     res.redirect('/admin/ministries');
   } catch (err) {
     const item = { ...req.body, _id: req.params.id };
-    render(res, 'ministry-form', { email: req.admin.email, item, error: err.message, active: 'ministries' });
+    res.render('admin/ministry-form', { item, error: err.message, active: 'ministries' });
   }
 };
 
@@ -367,8 +375,7 @@ const deleteMinistry = async (req, res) => {
 const getEventRsvps = async (req, res) => {
   try {
     const result = await eventRsvpService.getAll({ page: req.query.page || 1, limit: 50 });
-    render(res, 'event-rsvps', {
-      email: req.admin.email,
+    res.render('admin/event-rsvps', {
       items: result.data,
       pagination: result.pagination,
       active: 'event-rsvps',
@@ -381,8 +388,7 @@ const getEventRsvps = async (req, res) => {
 const getMinistryInterests = async (req, res) => {
   try {
     const result = await ministryInterestService.getAll({ page: req.query.page || 1, limit: 50 });
-    render(res, 'ministry-interests', {
-      email: req.admin.email,
+    res.render('admin/ministry-interests', {
       items: result.data,
       pagination: result.pagination,
       active: 'ministry-interests',
@@ -393,6 +399,7 @@ const getMinistryInterests = async (req, res) => {
 };
 
 module.exports = {
+  requireAuth,
   getLogin, postLogin, postLogout,
   dashboard,
   getPrayerRequests, viewPrayerRequest, approvePrayerRequest, deletePrayerRequest,

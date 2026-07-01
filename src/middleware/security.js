@@ -21,7 +21,7 @@ const corsMiddleware = cors({
     if (env.isDevelopment) {
       allowedOrigins.push('http://localhost:5173', 'http://localhost:5000');
     }
-    if (!origin || allowedOrigins.includes(normalizeOrigin(origin))) {
+    if (!origin || origin === 'null' || allowedOrigins.includes(normalizeOrigin(origin))) {
       callback(null, true);
     } else {
       logger.warn(`CORS blocked origin: ${origin}`);

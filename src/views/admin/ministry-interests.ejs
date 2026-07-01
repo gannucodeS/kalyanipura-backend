@@ -1,0 +1,37 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar', { active: 'ministry-interests' }) %>
+<div class="main-content">
+  <div class="top-bar">
+    <h1>Ministry Interests</h1>
+    <div class="admin-info">
+      <span><%= email %></span>
+      <form action="/admin/logout" method="POST"><button class="btn btn-outline btn-sm">Logout</button></form>
+    </div>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Ministry</th><th>Name</th><th>Email</th><th>Date</th></tr></thead>
+      <tbody>
+        <% if (items.length === 0) { %><tr><td colspan="4" class="empty-state">No interests found.</td></tr><% } %>
+        <% items.forEach(item => { %>
+          <tr>
+            <td><%= item.ministry ? item.ministry.title : 'N/A' %></td>
+            <td><%= item.name %></td>
+            <td><%= item.email %></td>
+            <td class="text-muted"><%= new Date(item.createdAt).toLocaleDateString() %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <% if (pagination.pages > 1) { %>
+      <div class="pagination">
+        <% if (pagination.hasPrev) { %><a href="?page=<%= pagination.page - 1 %>">&laquo; Prev</a><% } %>
+        <% for (let i = 1; i <= pagination.pages; i++) { %>
+          <a href="?page=<%= i %>" class="<%= i === pagination.page ? 'active' : '' %>"><%= i %></a>
+        <% } %>
+        <% if (pagination.hasNext) { %><a href="?page=<%= pagination.page + 1 %>">Next &raquo;</a><% } %>
+      </div>
+    <% } %>
+  </div>
+</div>
+<%- include('../partials/footer') %>

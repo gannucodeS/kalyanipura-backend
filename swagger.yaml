@@ -1,0 +1,708 @@
+openapi: "3.0.3"
+info:
+  title: "Kalyanipura Church API"
+  description: "REST API for Kalyanipura Church React application"
+  version: "1.0.0"
+  contact:
+    email: "hello@kalyanipurachurch.org"
+servers:
+  - url: "http://localhost:5000/api/v1"
+    description: "Development server"
+  - url: "https://api.kalyanipurachurch.org/api/v1"
+    description: "Production server"
+components:
+  securitySchemes:
+    BearerAuth:
+      type: "http"
+      scheme: "bearer"
+      bearerFormat: "JWT"
+      description: "Admin JWT token. Use POST /api/v1/admin/login to obtain."
+  schemas:
+    SuccessResponse:
+      type: "object"
+      properties:
+        success:
+          type: "boolean"
+          example: true
+        message:
+          type: "string"
+          example: "Success"
+        data:
+          type: "object"
+    ErrorResponse:
+      type: "object"
+      properties:
+        success:
+          type: "boolean"
+          example: false
+        message:
+          type: "string"
+          example: "Error message"
+        errors:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              field:
+                type: "string"
+              message:
+                type: "string"
+    Pagination:
+      type: "object"
+      properties:
+        page:
+          type: "integer"
+        limit:
+          type: "integer"
+        total:
+          type: "integer"
+        pages:
+          type: "integer"
+        hasNext:
+          type: "boolean"
+        hasPrev:
+          type: "boolean"
+    ServiceTime:
+      type: "object"
+      properties:
+        _id:
+          type: "string"
+        title:
+          type: "string"
+        time:
+          type: "string"
+        tagline:
+          type: "string"
+        category:
+          type: "string"
+        icon:
+          type: "string"
+          enum: ["sun", "moon", "users"]
+        createdAt:
+          type: "string"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+    GalleryItem:
+      type: "object"
+      properties:
+        _id:
+          type: "string"
+        imageUrl:
+          type: "string"
+        description:
+          type: "string"
+        category:
+          type: "string"
+        createdAt:
+          type: "string"
+          format: "date-time"
+    Ministry:
+      type: "object"
+      properties:
+        _id:
+          type: "string"
+        title:
+          type: "string"
+        description:
+          type: "string"
+        tagline:
+          type: "string"
+        iconName:
+          type: "string"
+          enum: ["smile", "users", "heart"]
+        detailedDescription:
+          type: "string"
+        meetingTimes:
+          type: "string"
+        contactEmail:
+          type: "string"
+        volunteerNeeds:
+          type: "string"
+        createdAt:
+          type: "string"
+          format: "date-time"
+    Event:
+      type: "object"
+      properties:
+        _id:
+          type: "string"
+        day:
+          type: "string"
+        month:
+          type: "string"
+        title:
+          type: "string"
+        time:
+          type: "string"
+        location:
+          type: "string"
+        description:
+          type: "string"
+        rsvpCount:
+          type: "integer"
+        createdAt:
+          type: "string"
+          format: "date-time"
+    PrayerRequest:
+      type: "object"
+      properties:
+        _id:
+          type: "string"
+        name:
+          type: "string"
+        category:
+          type: "string"
+          enum: ["Guidance", "Healing", "Comfort", "Thanksgiving", "Other"]
+        request:
+          type: "string"
+        isAnonymous:
+          type: "boolean"
+        prayedCount:
+          type: "integer"
+        isApproved:
+          type: "boolean"
+        createdAt:
+          type: "string"
+          format: "date-time"
+    ContactMessage:
+      type: "object"
+      properties:
+        _id:
+          type: "string"
+        name:
+          type: "string"
+        email:
+          type: "string"
+        topic:
+          type: "string"
+        message:
+          type: "string"
+        isRead:
+          type: "boolean"
+        createdAt:
+          type: "string"
+          format: "date-time"
+    Giving:
+      type: "object"
+      properties:
+        _id:
+          type: "string"
+        name:
+          type: "string"
+        email:
+          type: "string"
+        amount:
+          type: "number"
+        frequency:
+          type: "string"
+          enum: ["once", "monthly"]
+        createdAt:
+          type: "string"
+          format: "date-time"
+    EventRsvp:
+      type: "object"
+      properties:
+        _id:
+          type: "string"
+        event:
+          type: "string"
+        name:
+          type: "string"
+        email:
+          type: "string"
+        createdAt:
+          type: "string"
+          format: "date-time"
+    MinistryInterest:
+      type: "object"
+      properties:
+        _id:
+          type: "string"
+        ministry:
+          type: "string"
+        name:
+          type: "string"
+        email:
+          type: "string"
+        createdAt:
+          type: "string"
+          format: "date-time"
+tags:
+  - name: "Service Times"
+    description: "Weekly church service schedules"
+  - name: "Gallery"
+    description: "Church photo gallery"
+  - name: "Ministries"
+    description: "Church ministries"
+  - name: "Events"
+    description: "Church events and RSVPs"
+  - name: "Prayer Requests"
+    description: "Prayer wall submissions"
+  - name: "Contact"
+    description: "Contact form messages"
+  - name: "Giving"
+    description: "Donation records"
+  - name: "Admin"
+    description: "Admin authentication"
+paths:
+  # ─── Admin Auth ────────────────────────────────────
+  /admin/login:
+    post:
+      tags: ["Admin"]
+      summary: "Admin login"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required: ["email", "password"]
+              properties:
+                email:
+                  type: "string"
+                  format: "email"
+                password:
+                  type: "string"
+      responses:
+        "200":
+          description: "Login successful"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: "Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/logout:
+    post:
+      tags: ["Admin"]
+      summary: "Admin logout"
+      responses:
+        "200":
+          description: "Logged out"
+  /admin/me:
+    get:
+      tags: ["Admin"]
+      summary: "Get current admin info"
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: "Admin info"
+
+  # ─── Service Times ─────────────────────────────────
+  /service-times:
+    get:
+      tags: ["Service Times"]
+      summary: "Get all service times"
+      parameters:
+        - in: "query"
+          name: "page"
+          schema:
+            type: "integer"
+          description: "Page number"
+        - in: "query"
+          name: "limit"
+          schema:
+            type: "integer"
+          description: "Items per page"
+      responses:
+        "200":
+          description: "List of service times"
+    post:
+      tags: ["Service Times"]
+      summary: "Create a service time"
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceTime"
+      responses:
+        "201":
+          description: "Created"
+  /service-times/{id}:
+    get:
+      tags: ["Service Times"]
+      summary: "Get a service time by ID"
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Service time details"
+    put:
+      tags: ["Service Times"]
+      summary: "Update a service time"
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Updated"
+    delete:
+      tags: ["Service Times"]
+      summary: "Delete a service time (soft)"
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Deleted"
+
+  # ─── Gallery ───────────────────────────────────────
+  /gallery:
+    get:
+      tags: ["Gallery"]
+      summary: "Get all gallery items"
+      parameters:
+        - in: "query"
+          name: "category"
+          schema:
+            type: "string"
+          description: "Filter by category"
+        - in: "query"
+          name: "page"
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "limit"
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "List of gallery items"
+    post:
+      tags: ["Gallery"]
+      summary: "Create a gallery item"
+      security:
+        - BearerAuth: []
+      responses:
+        "201":
+          description: "Created"
+  /gallery/{id}:
+    get:
+      tags: ["Gallery"]
+      summary: "Get gallery item by ID"
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Gallery item details"
+    put:
+      tags: ["Gallery"]
+      summary: "Update a gallery item"
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: "Updated"
+    delete:
+      tags: ["Gallery"]
+      summary: "Delete a gallery item"
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: "Deleted"
+
+  # ─── Ministries ────────────────────────────────────
+  /ministries:
+    get:
+      tags: ["Ministries"]
+      summary: "Get all ministries"
+      responses:
+        "200":
+          description: "List of ministries"
+    post:
+      tags: ["Ministries"]
+      summary: "Create a ministry"
+      security:
+        - BearerAuth: []
+      responses:
+        "201":
+          description: "Created"
+  /ministries/{id}:
+    get:
+      tags: ["Ministries"]
+      summary: "Get ministry by ID"
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Ministry details"
+    put:
+      tags: ["Ministries"]
+      summary: "Update a ministry"
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: "Updated"
+    delete:
+      tags: ["Ministries"]
+      summary: "Delete a ministry"
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: "Deleted"
+
+  # ─── Events ────────────────────────────────────────
+  /events:
+    get:
+      tags: ["Events"]
+      summary: "Get all events"
+      parameters:
+        - in: "query"
+          name: "month"
+          schema:
+            type: "string"
+          description: "Filter by month"
+        - in: "query"
+          name: "page"
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "limit"
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "sort"
+          schema:
+            type: "string"
+          description: "Sort field (prefix with - for desc)"
+      responses:
+        "200":
+          description: "List of events"
+    post:
+      tags: ["Events"]
+      summary: "Create an event"
+      security:
+        - BearerAuth: []
+      responses:
+        "201":
+          description: "Created"
+  /events/{id}:
+    get:
+      tags: ["Events"]
+      summary: "Get event by ID"
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Event details"
+    put:
+      tags: ["Events"]
+      summary: "Update an event"
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: "Updated"
+    delete:
+      tags: ["Events"]
+      summary: "Delete an event"
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: "Deleted"
+  /events/{eventId}/rsvp:
+    post:
+      tags: ["Events"]
+      summary: "RSVP to an event"
+      parameters:
+        - in: "path"
+          name: "eventId"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required: ["name", "email"]
+              properties:
+                name:
+                  type: "string"
+                email:
+                  type: "string"
+                  format: "email"
+      responses:
+        "201":
+          description: "RSVP confirmed"
+  /events/{eventId}/rsvps:
+    get:
+      tags: ["Events"]
+      summary: "Get RSVPs for an event (admin)"
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: "path"
+          name: "eventId"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "List of RSVPs"
+
+  # ─── Prayer Requests ───────────────────────────────
+  /prayer-requests:
+    get:
+      tags: ["Prayer Requests"]
+      summary: "Get approved prayer requests (public)"
+      parameters:
+        - in: "query"
+          name: "category"
+          schema:
+            type: "string"
+          description: "Filter by category"
+        - in: "query"
+          name: "page"
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "limit"
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "List of prayer requests"
+    post:
+      tags: ["Prayer Requests"]
+      summary: "Submit a prayer request"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required: ["category", "request"]
+              properties:
+                name:
+                  type: "string"
+                category:
+                  type: "string"
+                  enum: ["Guidance", "Healing", "Comfort", "Thanksgiving", "Other"]
+                request:
+                  type: "string"
+                isAnonymous:
+                  type: "boolean"
+      responses:
+        "201":
+          description: "Prayer request submitted"
+  /prayer-requests/{id}/pray:
+    post:
+      tags: ["Prayer Requests"]
+      summary: "Increment prayer count"
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Prayed"
+  /prayer-requests/{id}/approve:
+    patch:
+      tags: ["Prayer Requests"]
+      summary: "Approve prayer request (admin)"
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Approved"
+
+  # ─── Contact ────────────────────────────────────────
+  /contact:
+    post:
+      tags: ["Contact"]
+      summary: "Submit a contact message"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required: ["name", "email", "topic", "message"]
+              properties:
+                name:
+                  type: "string"
+                email:
+                  type: "string"
+                topic:
+                  type: "string"
+                message:
+                  type: "string"
+      responses:
+        "201":
+          description: "Message sent"
+
+  # ─── Giving ────────────────────────────────────────
+  /giving:
+    post:
+      tags: ["Giving"]
+      summary: "Record a giving/donation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required: ["name", "email", "amount", "frequency"]
+              properties:
+                name:
+                  type: "string"
+                email:
+                  type: "string"
+                amount:
+                  type: "number"
+                frequency:
+                  type: "string"
+                  enum: ["once", "monthly"]
+      responses:
+        "201":
+          description: "Giving recorded"

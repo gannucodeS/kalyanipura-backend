@@ -1,0 +1,24 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar', { active: 'gallery' }) %>
+<div class="main-content">
+  <div class="top-bar">
+    <h1><%= item._id ? 'Edit' : 'New' %> Gallery Item</h1>
+    <div class="admin-info">
+      <span><%= email %></span>
+      <form action="/admin/logout" method="POST"><button class="btn btn-outline btn-sm">Logout</button></form>
+    </div>
+  </div>
+  <% if (locals.error) { %><div class="alert alert-error"><%= error %></div><% } %>
+  <div class="card">
+    <form action="/admin/gallery<%= item._id ? '/' + item._id + '/edit' : '/new' %>" method="POST">
+      <div class="form-group"><label>Image URL</label><input type="url" name="imageUrl" class="input" value="<%= item.imageUrl || '' %>" required></div>
+      <div class="form-group"><label>Description</label><textarea name="description" class="input" rows="3" required><%= item.description || '' %></textarea></div>
+      <div class="form-group"><label>Category</label><input type="text" name="category" class="input" value="<%= item.category || '' %>" required></div>
+      <div class="modal-actions">
+        <a href="/admin/gallery" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

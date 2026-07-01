@@ -1,0 +1,35 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar', { active: 'gallery' }) %>
+<div class="main-content">
+  <div class="top-bar">
+    <h1>Gallery Items</h1>
+    <div class="admin-info">
+      <span><%= email %></span>
+      <form action="/admin/logout" method="POST"><button class="btn btn-outline btn-sm">Logout</button></form>
+      <a href="/admin/gallery/new" class="btn btn-primary">+ New</a>
+    </div>
+  </div>
+  <% if (locals.success) { %><div class="alert alert-success"><%= success %></div><% } %>
+  <div class="card">
+    <table>
+      <thead><tr><th>Image</th><th>Description</th><th>Category</th><th>Actions</th></tr></thead>
+      <tbody>
+        <% if (items.length === 0) { %><tr><td colspan="4" class="empty-state">No gallery items found.</td></tr><% } %>
+        <% items.forEach(item => { %>
+          <tr>
+            <td><img src="<%= item.imageUrl %>" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:4px;"></td>
+            <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= item.description %></td>
+            <td><span class="tag"><%= item.category %></span></td>
+            <td>
+              <div class="actions">
+                <a href="/admin/gallery/<%= item._id %>/edit" class="btn btn-outline btn-sm">Edit</a>
+                <a href="/admin/gallery/<%= item._id %>/delete" class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">Delete</a>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- include('../partials/footer') %>

@@ -1,0 +1,61 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar', { active: 'messages' }) %>
+<div class="main-content">
+  <div class="top-bar">
+    <h1>Contact Messages</h1>
+    <div class="admin-info">
+      <span><%= email %></span>
+      <form action="/admin/logout" method="POST"><button class="btn btn-outline btn-sm">Logout</button></form>
+    </div>
+  </div>
+  <% if (locals.success) { %><div class="alert alert-success"><%= success %></div><% } %>
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Topic</th>
+          <th>Message</th>
+          <th>Read</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (messages.length === 0) { %>
+          <tr><td colspan="7" class="empty-state">No messages found.</td></tr>
+        <% } %>
+        <% messages.forEach(m => { %>
+          <tr>
+            <td><%= m.name %></td>
+            <td><%= m.email %></td>
+            <td><span class="tag"><%= m.topic %></span></td>
+            <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= m.message %></td>
+            <td><%= m.isRead ? 'Yes' : 'No' %></td>
+            <td class="text-muted"><%= new Date(m.createdAt).toLocaleDateString() %></td>
+            <td>
+              <div class="actions">
+                <a href="/admin/messages/<%= m._id %>/view" class="btn btn-outline btn-sm">View</a>
+                <% if (!m.isRead) { %>
+                  <a href="/admin/messages/<%= m._id %>/read" class="btn btn-success btn-sm">Mark Read</a>
+                <% } %>
+                <a href="/admin/messages/<%= m._id %>/delete" class="btn btn-danger btn-sm" onclick="return confirm('Delete this message?')">Delete</a>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <% if (pagination.pages > 1) { %>
+      <div class="pagination">
+        <% if (pagination.hasPrev) { %><a href="?page=<%= pagination.page - 1 %>">&laquo; Prev</a><% } %>
+        <% for (let i = 1; i <= pagination.pages; i++) { %>
+          <a href="?page=<%= i %>" class="<%= i === pagination.page ? 'active' : '' %>"><%= i %></a>
+        <% } %>
+        <% if (pagination.hasNext) { %><a href="?page=<%= pagination.page + 1 %>">Next &raquo;</a><% } %>
+      </div>
+    <% } %>
+  </div>
+</div>
+<%- include('../partials/footer') %>

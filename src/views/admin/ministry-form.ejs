@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar', { active: 'ministries' }) %>
+<div class="main-content">
+  <div class="top-bar">
+    <h1><%= item._id ? 'Edit' : 'New' %> Ministry</h1>
+    <div class="admin-info">
+      <span><%= email %></span>
+      <form action="/admin/logout" method="POST"><button class="btn btn-outline btn-sm">Logout</button></form>
+    </div>
+  </div>
+  <% if (locals.error) { %><div class="alert alert-error"><%= error %></div><% } %>
+  <div class="card">
+    <form action="/admin/ministries<%= item._id ? '/' + item._id + '/edit' : '/new' %>" method="POST">
+      <div class="form-group"><label>Title</label><input type="text" name="title" class="input" value="<%= item.title || '' %>" required></div>
+      <div class="form-group"><label>Description</label><textarea name="description" class="input" rows="3" required><%= item.description || '' %></textarea></div>
+      <div class="form-group"><label>Tagline</label><input type="text" name="tagline" class="input" value="<%= item.tagline || '' %>" required></div>
+      <div class="form-group">
+        <label>Icon</label>
+        <select name="iconName" class="input" required>
+          <option value="smile" <%= item.iconName === 'smile' ? 'selected' : '' %>>Smile</option>
+          <option value="users" <%= item.iconName === 'users' ? 'selected' : '' %>>Users</option>
+          <option value="heart" <%= item.iconName === 'heart' ? 'selected' : '' %>>Heart</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Detailed Description</label><textarea name="detailedDescription" class="input" rows="5" required><%= item.detailedDescription || '' %></textarea></div>
+      <div class="form-group"><label>Meeting Times</label><input type="text" name="meetingTimes" class="input" value="<%= item.meetingTimes || '' %>" required></div>
+      <div class="form-group"><label>Contact Email</label><input type="email" name="contactEmail" class="input" value="<%= item.contactEmail || '' %>" required></div>
+      <div class="form-group"><label>Volunteer Needs</label><textarea name="volunteerNeeds" class="input" rows="3"><%= item.volunteerNeeds || '' %></textarea></div>
+      <div class="modal-actions">
+        <a href="/admin/ministries" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

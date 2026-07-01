@@ -1,0 +1,38 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar', { active: 'dashboard' }) %>
+<div class="main-content">
+  <div class="top-bar">
+    <h1>Dashboard</h1>
+    <div class="admin-info">
+      <span><%= email %></span>
+      <form action="/admin/logout" method="POST"><button class="btn btn-outline btn-sm">Logout</button></form>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value"><%= stats.prayerRequests %></div>
+      <div class="stat-label">Prayer Requests</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= stats.messages %></div>
+      <div class="stat-label">Contact Messages</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= stats.giving %></div>
+      <div class="stat-label">Giving Records</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= stats.events %></div>
+      <div class="stat-label">Events</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= stats.eventRsvps %></div>
+      <div class="stat-label">Event RSVPs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= stats.ministryInterests %></div>
+      <div class="stat-label">Ministry Interests</div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

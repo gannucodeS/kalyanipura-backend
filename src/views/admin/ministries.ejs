@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar', { active: 'ministries' }) %>
+<div class="main-content">
+  <div class="top-bar">
+    <h1>Ministries</h1>
+    <div class="admin-info">
+      <span><%= email %></span>
+      <form action="/admin/logout" method="POST"><button class="btn btn-outline btn-sm">Logout</button></form>
+      <a href="/admin/ministries/new" class="btn btn-primary">+ New</a>
+    </div>
+  </div>
+  <% if (locals.success) { %><div class="alert alert-success"><%= success %></div><% } %>
+  <div class="card">
+    <table>
+      <thead><tr><th>Title</th><th>Tagline</th><th>Icon</th><th>Contact</th><th>Actions</th></tr></thead>
+      <tbody>
+        <% if (items.length === 0) { %><tr><td colspan="5" class="empty-state">No ministries found.</td></tr><% } %>
+        <% items.forEach(item => { %>
+          <tr>
+            <td><strong><%= item.title %></strong></td>
+            <td class="text-muted"><%= item.tagline %></td>
+            <td><%= item.iconName %></td>
+            <td><%= item.contactEmail %></td>
+            <td>
+              <div class="actions">
+                <a href="/admin/ministries/<%= item._id %>/edit" class="btn btn-outline btn-sm">Edit</a>
+                <a href="/admin/ministries/<%= item._id %>/delete" class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">Delete</a>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- include('../partials/footer') %>

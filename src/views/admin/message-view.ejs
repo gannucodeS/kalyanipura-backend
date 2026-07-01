@@ -1,0 +1,25 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar', { active: 'messages' }) %>
+<div class="main-content">
+  <div class="top-bar">
+    <h1>Message Details</h1>
+    <div class="admin-info">
+      <span><%= email %></span>
+      <form action="/admin/logout" method="POST"><button class="btn btn-outline btn-sm">Logout</button></form>
+    </div>
+  </div>
+  <div class="card">
+    <div class="form-group"><label>Name</label><div><%= m.name %></div></div>
+    <div class="form-group"><label>Email</label><div><%= m.email %></div></div>
+    <div class="form-group"><label>Topic</label><div><span class="tag"><%= m.topic %></span></div></div>
+    <div class="form-group"><label>Message</label><pre><%= m.message %></pre></div>
+    <div class="form-group"><label>Read</label><div><%= m.isRead ? 'Yes' : 'No' %></div></div>
+    <div class="form-group"><label>Received</label><div><%= new Date(m.createdAt).toLocaleString() %></div></div>
+    <div class="modal-actions">
+      <a href="/admin/messages" class="btn btn-outline">Back</a>
+      <% if (!m.isRead) { %><a href="/admin/messages/<%= m._id %>/read" class="btn btn-success">Mark Read</a><% } %>
+      <a href="/admin/messages/<%= m._id %>/delete" class="btn btn-danger" onclick="return confirm('Delete?')">Delete</a>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

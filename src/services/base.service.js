@@ -1,5 +1,6 @@
 const ApiError = require('../utils/ApiError');
 const cache = require('../utils/cache');
+const { autoTranslate } = require('../utils/translate');
 
 class BaseService {
   constructor(model, cachePrefix = '') {
@@ -55,6 +56,7 @@ class BaseService {
   async create(data) {
     const doc = await this.model.create(data);
     cache.delByPattern(`^${this.cachePrefix}`);
+    await autoTranslate(doc, this.model.modelName);
     return doc;
   }
 
@@ -67,6 +69,7 @@ class BaseService {
       throw ApiError.notFound(`${this.model.modelName} not found`);
     }
     cache.delByPattern(`^${this.cachePrefix}`);
+    await autoTranslate(doc, this.model.modelName);
     return doc;
   }
 

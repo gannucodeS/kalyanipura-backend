@@ -52,6 +52,12 @@ const ministrySchema = new mongoose.Schema(
       maxlength: [500, 'Volunteer needs cannot exceed 500 characters'],
       default: '',
     },
+    titleHi: { type: String, trim: true, default: '' },
+    descriptionHi: { type: String, trim: true, default: '' },
+    taglineHi: { type: String, trim: true, default: '' },
+    detailedDescriptionHi: { type: String, trim: true, default: '' },
+    meetingTimesHi: { type: String, trim: true, default: '' },
+    volunteerNeedsHi: { type: String, trim: true, default: '' },
     isDeleted: {
       type: Boolean,
       default: false,

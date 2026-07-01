@@ -38,6 +38,10 @@ const eventSchema = new mongoose.Schema(
       trim: true,
       maxlength: [2000, 'Description cannot exceed 2000 characters'],
     },
+    titleHi: { type: String, trim: true, default: '' },
+    timeHi: { type: String, trim: true, default: '' },
+    locationHi: { type: String, trim: true, default: '' },
+    descriptionHi: { type: String, trim: true, default: '' },
     rsvpCount: {
       type: Number,
       default: 0,

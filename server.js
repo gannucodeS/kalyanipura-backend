@@ -8,6 +8,9 @@ const startServer = async () => {
   try {
     await connectDB();
 
+    await require('./src/utils/seed')();
+    logger.info('Database seeded (if empty)');
+
     server = app.listen(env.port, () => {
       logger.info(`Server running in ${env.nodeEnv} mode on port ${env.port}`);
       logger.info(`API: http://localhost:${env.port}/api/v1`);

@@ -19,6 +19,8 @@ const galleryItemSchema = new mongoose.Schema(
       trim: true,
       maxlength: [100, 'Category cannot exceed 100 characters'],
     },
+    descriptionHi: { type: String, trim: true, default: '' },
+    categoryHi: { type: String, trim: true, default: '' },
     isDeleted: {
       type: Boolean,
       default: false,

@@ -34,6 +34,10 @@ const serviceTimeSchema = new mongoose.Schema(
         message: 'Icon must be one of: sun, moon, users',
       },
     },
+    titleHi: { type: String, trim: true, default: '' },
+    timeHi: { type: String, trim: true, default: '' },
+    taglineHi: { type: String, trim: true, default: '' },
+    categoryHi: { type: String, trim: true, default: '' },
     isDeleted: {
       type: Boolean,
       default: false,

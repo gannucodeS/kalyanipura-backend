@@ -10,16 +10,21 @@ const securityHeaders = helmet({
   crossOriginEmbedderPolicy: false,
 });
 
+const logger = require('../utils/logger');
 const normalizeOrigin = (url) => url?.replace(/\/+$/, '');
 const corsMiddleware = cors({
   origin: function (origin, callback) {
-    const allowedOrigins = [normalizeOrigin(env.clientUrl)];
+    const allowedOrigins = [
+      normalizeOrigin(env.clientUrl),
+      'https://kalyanipura-backend.onrender.com',
+    ];
     if (env.isDevelopment) {
       allowedOrigins.push('http://localhost:5173', 'http://localhost:5000');
     }
     if (!origin || allowedOrigins.includes(normalizeOrigin(origin))) {
       callback(null, true);
     } else {
+      logger.warn(`CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },

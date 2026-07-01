@@ -4,7 +4,14 @@ const { authLimiter } = require('../middleware/rateLimiter');
 
 const router = Router();
 
-router.use(controller.requireAuth);
+const noStore = (_req, res, next) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+};
+
+router.use(controller.requireAuth, noStore);
 
 router.get('/login', controller.getLogin);
 router.post('/login', authLimiter, controller.postLogin);

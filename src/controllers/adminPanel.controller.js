@@ -23,8 +23,8 @@ const postLogin = async (req, res) => {
     const result = await adminService.login(email, password);
     res.cookie('adminToken', result.token, {
       httpOnly: true,
-      secure: req.secure,
-      sameSite: 'strict',
+      sameSite: 'lax',
+      path: '/',
       maxAge: 24 * 60 * 60 * 1000,
     });
     res.redirect('/admin');

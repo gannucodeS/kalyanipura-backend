@@ -15,7 +15,7 @@ services:
       - key: MONGODB_URI
         sync: false
       - key: CLIENT_URL
-        value: https://kalyanipura-church.vercel.app
+        value: https://kalyanipurachurch.vercel.app
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD

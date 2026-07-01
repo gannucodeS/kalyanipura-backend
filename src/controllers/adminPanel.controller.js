@@ -23,7 +23,7 @@ const postLogin = async (req, res) => {
     const result = await adminService.login(email, password);
     res.cookie('adminToken', result.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: req.secure,
       sameSite: 'strict',
       maxAge: 24 * 60 * 60 * 1000,
     });

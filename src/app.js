@@ -21,6 +21,7 @@ const app = express();
 
 app.set('view engine', 'ejs');
 app.set('views', path.resolve(__dirname, 'views'));
+app.set('trust proxy', 1);
 
 app.use(compression());
 app.use(securityHeaders);

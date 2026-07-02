@@ -11,7 +11,8 @@
   <div class="card">
     <div class="form-group"><label>Name</label><div><%= r.name %></div></div>
     <div class="form-group"><label>Category</label><div><span class="tag"><%= r.category %></span></div></div>
-    <div class="form-group"><label>Request</label><pre><%= r.request %></pre></div>
+    <div class="form-group"><label>Request (EN)</label><pre><%= r.request %></pre></div>
+    <div class="form-group"><label>Request (HI)</label><pre><%= r.requestHi || '(not translated)' %></pre></div>
     <div class="form-group"><label>Anonymous</label><div><%= r.isAnonymous ? 'Yes' : 'No' %></div></div>
     <div class="form-group"><label>Prayed Count</label><div><%= r.prayedCount %></div></div>
     <div class="form-group"><label>Approved</label><div><%= r.isApproved ? 'Yes' : 'No' %></div></div>

@@ -22,6 +22,12 @@ const prayerRequestSchema = new mongoose.Schema(
       trim: true,
       maxlength: [1000, 'Prayer request cannot exceed 1000 characters'],
     },
+    requestHi: {
+      type: String,
+      trim: true,
+      maxlength: [1000, 'Hindi translation cannot exceed 1000 characters'],
+      default: '',
+    },
     isAnonymous: {
       type: Boolean,
       default: false,

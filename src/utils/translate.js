@@ -7,6 +7,7 @@ const TRANSLATABLE_FIELDS = {
   Ministry: ['title', 'description', 'tagline', 'detailedDescription', 'meetingTimes', 'volunteerNeeds'],
   GalleryItem: ['description', 'category'],
   ServiceTime: ['title', 'time', 'tagline', 'category'],
+  PrayerRequest: ['request'],
 };
 
 function getHiFieldName(field) {

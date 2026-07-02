@@ -1,0 +1,29 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar', { active: 'stream-settings' }) %>
+<div class="main-content">
+  <div class="top-bar">
+    <h1>Watch Sermon / Stream Settings</h1>
+    <div class="admin-info">
+      <span><%= email %></span>
+      <form action="/admin/logout" method="POST"><button class="btn btn-outline btn-sm">Logout</button></form>
+    </div>
+  </div>
+  <% if (locals.success) { %><div class="alert alert-success"><%= success %></div><% } %>
+  <% if (!setting) { %>
+    <div class="card">
+      <p class="text-muted">No stream settings configured yet.</p>
+    </div>
+  <% } else { %>
+    <div class="card">
+      <div class="form-group"><label>YouTube URL</label><div style="word-break:break-all"><%= setting.youtubeUrl || '(not set)' %></div></div>
+      <div class="form-group"><label>Church Platform URL</label><div style="word-break:break-all"><%= setting.churchPlatformUrl || '(not set)' %></div></div>
+      <div class="form-group"><label>Status</label><div><%= setting.isLive ? 'Live Now' : 'Offline' %></div></div>
+      <div class="form-group"><label>Service Times (EN)</label><div><%= setting.serviceTimes %></div></div>
+      <div class="form-group"><label>Service Times (HI)</label><div><%= setting.serviceTimesHi %></div></div>
+      <div class="modal-actions">
+        <a href="/admin/stream-settings/<%= setting._id %>/edit" class="btn btn-primary">Edit</a>
+      </div>
+    </div>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

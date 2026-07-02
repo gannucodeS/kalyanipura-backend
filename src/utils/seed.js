@@ -5,6 +5,7 @@ const Ministry = require('../models/Ministry');
 const GalleryItem = require('../models/GalleryItem');
 const ServiceTime = require('../models/ServiceTime');
 const ZoomMeeting = require('../models/ZoomMeeting');
+const StreamSetting = require('../models/StreamSetting');
 
 const serviceTimes = [
   {
@@ -154,6 +155,24 @@ const models = [
   { name: 'Event', data: events, Model: Event },
 ];
 
+const streamSetting = {
+  youtubeUrl: '',
+  churchPlatformUrl: '',
+  isLive: false,
+  serviceTimes: 'Sunday services at 9:00 AM & 11:00 AM',
+  serviceTimesHi: 'रविवार सेवाएं सुबह 9:00 बजे और 11:00 बजे',
+};
+
+async function seedStreamSetting() {
+  const existing = await StreamSetting.countDocuments({ isDeleted: false });
+  if (existing > 0) {
+    console.log('StreamSetting: exists, skipping seed.');
+    return;
+  }
+  await StreamSetting.create(streamSetting);
+  console.log('StreamSetting: seeded 1 item.');
+}
+
 async function seedZoomMeeting() {
   const existing = await ZoomMeeting.countDocuments({ isDeleted: false });
   if (existing > 0) {
@@ -175,6 +194,7 @@ async function seed() {
     console.log(`${name}: seeded ${inserted.length} items.`);
   }
   await seedZoomMeeting();
+  await seedStreamSetting();
   console.log('Seed complete.');
 }
 

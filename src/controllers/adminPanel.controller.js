@@ -9,6 +9,7 @@ const eventRsvpService = require('../services/eventRsvp.service');
 const galleryService = require('../services/gallery.service');
 const ministryService = require('../services/ministry.service');
 const zoomMeetingService = require('../services/zoomMeeting.service');
+const streamSettingService = require('../services/streamSetting.service');
 const ministryInterestService = require('../services/ministryInterest.service');
 
 const requireAuth = (req, res, next) => {
@@ -467,6 +468,47 @@ const toggleZoomMeeting = async (req, res) => {
   }
 };
 
+const getStreamSettings = async (req, res) => {
+  try {
+    const settings = await streamSettingService.getAll({ limit: 1 });
+    const setting = settings.data && settings.data.length > 0 ? settings.data[0] : null;
+    res.render('admin/stream-settings', {
+      setting,
+      active: 'stream-settings',
+    });
+  } catch (err) {
+    res.redirect('/admin');
+  }
+};
+
+const editStreamSetting = async (req, res) => {
+  try {
+    const setting = await streamSettingService.getById(req.params.id);
+    res.render('admin/stream-setting-form', {
+      setting,
+      active: 'stream-settings',
+    });
+  } catch (err) {
+    res.redirect('/admin/stream-settings');
+  }
+};
+
+const updateStreamSetting = async (req, res) => {
+  try {
+    const data = {
+      youtubeUrl: req.body.youtubeUrl || '',
+      churchPlatformUrl: req.body.churchPlatformUrl || '',
+      isLive: req.body.isLive === 'on' || req.body.isLive === true,
+      serviceTimes: req.body.serviceTimes || '',
+      serviceTimesHi: req.body.serviceTimesHi || '',
+    };
+    await streamSettingService.update(req.params.id, data);
+    res.redirect('/admin/stream-settings?success=Settings+updated');
+  } catch (err) {
+    res.redirect(`/admin/stream-settings/${req.params.id}/edit`);
+  }
+};
+
 module.exports = {
   requireAuth,
   getLogin, postLogin, postLogout,
@@ -480,4 +522,5 @@ module.exports = {
   getMinistries, newMinistry, createMinistry, editMinistry, updateMinistry, deleteMinistry,
   getEventRsvps, getMinistryInterests,
   getZoomMeetings, editZoomMeeting, updateZoomMeeting, toggleZoomMeeting,
+  getStreamSettings, editStreamSetting, updateStreamSetting,
 };

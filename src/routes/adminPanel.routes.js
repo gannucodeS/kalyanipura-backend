@@ -69,4 +69,8 @@ router.get('/zoom-meetings/:id/edit', controller.editZoomMeeting);
 router.post('/zoom-meetings/:id/edit', controller.updateZoomMeeting);
 router.get('/zoom-meetings/:id/toggle', controller.toggleZoomMeeting);
 
+router.get('/stream-settings', controller.getStreamSettings);
+router.get('/stream-settings/:id/edit', controller.editStreamSetting);
+router.post('/stream-settings/:id/edit', controller.updateStreamSetting);
+
 module.exports = router;

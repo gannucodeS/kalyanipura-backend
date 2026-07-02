@@ -1,5 +1,5 @@
 const streamSettingService = require('../services/streamSetting.service');
-const asyncHandler = require('../middleware/asyncHandler');
+const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/ApiResponse');
 
 const getPublic = asyncHandler(async (req, res) => {

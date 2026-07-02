@@ -26,14 +26,18 @@ async function translateText(text) {
       cache.delete(firstKey);
     }
     return result.text;
-  } catch {
+  } catch (err) {
+    console.error(`[translate] Failed to translate "${key.slice(0, 50)}":`, err.message);
     return '';
   }
 }
 
 async function autoTranslate(doc, modelName) {
   const fields = TRANSLATABLE_FIELDS[modelName];
-  if (!fields) return doc;
+  if (!fields) {
+    console.log(`[translate] No translatable fields for model "${modelName}"`);
+    return doc;
+  }
 
   const updates = {};
   const tasks = [];
@@ -48,11 +52,18 @@ async function autoTranslate(doc, modelName) {
     }
   }
 
-  if (tasks.length === 0) return doc;
+  if (tasks.length === 0) {
+    console.log(`[translate] No fields to translate for ${modelName} (id=${doc._id})`);
+    return doc;
+  }
+  console.log(`[translate] Translating ${tasks.length} field(s) for ${modelName} (id=${doc._id})`);
   await Promise.all(tasks);
   if (Object.keys(updates).length > 0) {
     Object.assign(doc, updates);
     await doc.save();
+    console.log(`[translate] Saved translations for ${modelName} (id=${doc._id}):`, Object.keys(updates));
+  } else {
+    console.log(`[translate] No translations received for ${modelName} (id=${doc._id}) - Google Translate may have failed`);
   }
   return doc;
 }

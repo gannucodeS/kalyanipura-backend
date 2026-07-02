@@ -23,6 +23,7 @@ router.get('/prayer-requests', controller.getPrayerRequests);
 router.get('/prayer-requests/:id/view', controller.viewPrayerRequest);
 router.get('/prayer-requests/:id/approve', controller.approvePrayerRequest);
 router.get('/prayer-requests/:id/delete', controller.deletePrayerRequest);
+router.get('/prayer-requests/backfill-translations', controller.backfillPrayerTranslations);
 
 router.get('/messages', controller.getMessages);
 router.get('/messages/:id/view', controller.viewMessage);

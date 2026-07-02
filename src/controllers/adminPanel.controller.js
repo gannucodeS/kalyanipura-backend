@@ -108,6 +108,22 @@ const deletePrayerRequest = async (req, res) => {
   }
 };
 
+const backfillPrayerTranslations = async (req, res) => {
+  try {
+    const { autoTranslate } = require('../utils/translate');
+    const PrayerRequest = require('../models/PrayerRequest');
+    const pending = await PrayerRequest.find({ requestHi: { $in: [null, ''] }, isDeleted: false });
+    let translated = 0;
+    for (const doc of pending) {
+      await autoTranslate(doc, 'PrayerRequest');
+      if (doc.requestHi) translated++;
+    }
+    res.redirect(`/admin/prayer-requests?success=Backfilled ${translated}/${pending.length} translations`);
+  } catch (err) {
+    res.redirect('/admin/prayer-requests');
+  }
+};
+
 const getMessages = async (req, res) => {
   try {
     const result = await contactService.getAll({ page: req.query.page || 1, limit: 50, includeDeleted: false });

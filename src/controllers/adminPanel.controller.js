@@ -513,7 +513,7 @@ module.exports = {
   requireAuth,
   getLogin, postLogin, postLogout,
   dashboard,
-  getPrayerRequests, viewPrayerRequest, approvePrayerRequest, deletePrayerRequest,
+  getPrayerRequests, viewPrayerRequest, approvePrayerRequest, deletePrayerRequest, backfillPrayerTranslations,
   getMessages, viewMessage, markMessageRead, deleteMessage,
   getGiving, deleteGiving,
   getServiceTimes, newServiceTime, createServiceTime, editServiceTime, updateServiceTime, deleteServiceTime,

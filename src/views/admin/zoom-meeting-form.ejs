@@ -1,0 +1,51 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar', { active: 'zoom-meetings' }) %>
+<div class="main-content">
+  <div class="top-bar">
+    <h1><%= meeting ? 'Edit' : 'New' %> Zoom Meeting</h1>
+    <div class="admin-info">
+      <span><%= email %></span>
+      <form action="/admin/logout" method="POST"><button class="btn btn-outline btn-sm">Logout</button></form>
+    </div>
+  </div>
+  <div class="card">
+    <form action="/admin/zoom-meetings/<%= meeting._id %>/edit" method="POST">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" value="<%= meeting.title %>" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="3" class="form-control"><%= meeting.description %></textarea>
+      </div>
+      <div class="form-group">
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" value="<%= meeting.date ? new Date(meeting.date).toISOString().split('T')[0] : '' %>" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="time">Time</label>
+        <input type="text" id="time" name="time" value="<%= meeting.time %>" class="form-control" placeholder="e.g. 10:00 AM" />
+      </div>
+      <div class="form-group">
+        <label for="timeZone">Timezone</label>
+        <input type="text" id="timeZone" name="timeZone" value="<%= meeting.timeZone %>" class="form-control" placeholder="e.g. Asia/Kolkata" />
+      </div>
+      <div class="form-group">
+        <label for="joinUrl">Zoom Join URL</label>
+        <input type="url" id="joinUrl" name="joinUrl" value="<%= meeting.joinUrl %>" class="form-control" placeholder="https://zoom.us/j/..." />
+        <small class="text-muted">Leave empty to hide the meeting from the frontend.</small>
+      </div>
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" name="isActive" <%= meeting.isActive ? 'checked' : '' %> />
+          Active (show on site)
+        </label>
+      </div>
+      <div class="modal-actions">
+        <a href="/admin/zoom-meetings" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

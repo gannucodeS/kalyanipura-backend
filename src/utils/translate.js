@@ -8,6 +8,7 @@ const TRANSLATABLE_FIELDS = {
   GalleryItem: ['description', 'category'],
   ServiceTime: ['title', 'time', 'tagline', 'category'],
   PrayerRequest: ['request'],
+  ZoomMeeting: ['title', 'description'],
 };
 
 function getHiFieldName(field) {

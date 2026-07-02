@@ -4,6 +4,7 @@ const Event = require('../models/Event');
 const Ministry = require('../models/Ministry');
 const GalleryItem = require('../models/GalleryItem');
 const ServiceTime = require('../models/ServiceTime');
+const ZoomMeeting = require('../models/ZoomMeeting');
 
 const serviceTimes = [
   {
@@ -134,12 +135,34 @@ const events = [
   },
 ];
 
+const zoomMeeting = {
+  title: 'Sunday Worship Service',
+  titleHi: 'रविवार आराधना सेवा',
+  description: 'Join us for our weekly Sunday worship service.',
+  descriptionHi: 'हमारी साप्ताहिक रविवार आराधना सेवा के लिए जुड़ें।',
+  joinUrl: '',
+  date: null,
+  time: '10:00 AM',
+  timeZone: 'Asia/Kolkata',
+  isActive: true,
+};
+
 const models = [
   { name: 'ServiceTime', data: serviceTimes, Model: ServiceTime },
   { name: 'GalleryItem', data: galleryItems, Model: GalleryItem },
   { name: 'Ministry', data: ministries, Model: Ministry },
   { name: 'Event', data: events, Model: Event },
 ];
+
+async function seedZoomMeeting() {
+  const existing = await ZoomMeeting.countDocuments({ isDeleted: false });
+  if (existing > 0) {
+    console.log(`ZoomMeeting: ${existing} items exist, skipping seed.`);
+    return;
+  }
+  await ZoomMeeting.create(zoomMeeting);
+  console.log('ZoomMeeting: seeded 1 item.');
+}
 
 async function seed() {
   for (const { name, data, Model } of models) {
@@ -151,6 +174,7 @@ async function seed() {
     const inserted = await Model.insertMany(data);
     console.log(`${name}: seeded ${inserted.length} items.`);
   }
+  await seedZoomMeeting();
   console.log('Seed complete.');
 }
 

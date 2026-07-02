@@ -64,4 +64,9 @@ router.get('/ministries/:id/delete', controller.deleteMinistry);
 router.get('/event-rsvps', controller.getEventRsvps);
 router.get('/ministry-interests', controller.getMinistryInterests);
 
+router.get('/zoom-meetings', controller.getZoomMeetings);
+router.get('/zoom-meetings/:id/edit', controller.editZoomMeeting);
+router.post('/zoom-meetings/:id/edit', controller.updateZoomMeeting);
+router.get('/zoom-meetings/:id/toggle', controller.toggleZoomMeeting);
+
 module.exports = router;

@@ -8,6 +8,7 @@ const eventService = require('../services/event.service');
 const eventRsvpService = require('../services/eventRsvp.service');
 const galleryService = require('../services/gallery.service');
 const ministryService = require('../services/ministry.service');
+const zoomMeetingService = require('../services/zoomMeeting.service');
 const ministryInterestService = require('../services/ministryInterest.service');
 
 const requireAuth = (req, res, next) => {
@@ -414,6 +415,58 @@ const getMinistryInterests = async (req, res) => {
   }
 };
 
+const getZoomMeetings = async (req, res) => {
+  try {
+    const meetings = await zoomMeetingService.getAll({ page: 1, limit: 1 });
+    res.render('admin/zoom-meetings', {
+      meeting: meetings.data && meetings.data.length > 0 ? meetings.data[0] : null,
+      active: 'zoom-meetings',
+    });
+  } catch (err) {
+    res.redirect('/admin');
+  }
+};
+
+const editZoomMeeting = async (req, res) => {
+  try {
+    const meeting = await zoomMeetingService.getById(req.params.id);
+    res.render('admin/zoom-meeting-form', {
+      meeting,
+      active: 'zoom-meetings',
+    });
+  } catch (err) {
+    res.redirect('/admin/zoom-meetings');
+  }
+};
+
+const updateZoomMeeting = async (req, res) => {
+  try {
+    const data = {
+      title: req.body.title || '',
+      description: req.body.description || '',
+      joinUrl: req.body.joinUrl || '',
+      date: req.body.date || null,
+      time: req.body.time || '',
+      timeZone: req.body.timeZone || 'Asia/Kolkata',
+      isActive: req.body.isActive === 'on' || req.body.isActive === true,
+    };
+    await zoomMeetingService.update(req.params.id, data);
+    res.redirect('/admin/zoom-meetings?success=Meeting+updated');
+  } catch (err) {
+    res.redirect(`/admin/zoom-meetings/${req.params.id}/edit`);
+  }
+};
+
+const toggleZoomMeeting = async (req, res) => {
+  try {
+    const meeting = await zoomMeetingService.getById(req.params.id);
+    await zoomMeetingService.update(req.params.id, { isActive: !meeting.isActive });
+    res.redirect('/admin/zoom-meetings');
+  } catch (err) {
+    res.redirect('/admin/zoom-meetings');
+  }
+};
+
 module.exports = {
   requireAuth,
   getLogin, postLogin, postLogout,
@@ -426,4 +479,5 @@ module.exports = {
   getGallery, newGallery, createGallery, editGallery, updateGallery, deleteGallery,
   getMinistries, newMinistry, createMinistry, editMinistry, updateMinistry, deleteMinistry,
   getEventRsvps, getMinistryInterests,
+  getZoomMeetings, editZoomMeeting, updateZoomMeeting, toggleZoomMeeting,
 };
